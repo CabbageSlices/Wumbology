@@ -28,7 +28,7 @@ public class PlayerController : MonoBehaviour
     private Vector2 currentForwardDirection  {
         get {
             Quaternion rotator = Quaternion.EulerAngles(0, 0, transform.localRotation.eulerAngles.z);
-            return defaultForward.rot 
+            return new Vector2(1,0);
         }
     }
 
