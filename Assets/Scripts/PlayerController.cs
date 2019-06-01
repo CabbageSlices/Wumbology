@@ -27,8 +27,8 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 currentForwardDirection  {
         get {
-            Quaternion rotator = Quaternion.EulerAngles(0, 0, transform.localRotation.eulerAngles.z);
-            return new Vector2(1,0);
+            Quaternion rotator = Quaternion.Euler(0, 0, transform.localRotation.eulerAngles.z);
+            return rotator * defaultForward;
         }
     }
 
@@ -56,7 +56,7 @@ public class PlayerController : MonoBehaviour
     }
 
     public void activateMeleeAttack() {
-        GameObject.Instantiate()
+        
     }
 
     // Start is called before the first frame update
@@ -76,6 +76,7 @@ public class PlayerController : MonoBehaviour
     {
         Quaternion current = transform.localRotation;
         transform.localRotation = Quaternion.Slerp(current, targetOrientation, Time.deltaTime * rotationRate);
+        Debug.Log(currentForwardDirection);
     }
 
     void applyInputAcceleration() {
