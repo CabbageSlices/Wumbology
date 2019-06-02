@@ -41,24 +41,52 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D body;
 
     private enum States {
+        not_attacking,
+        attackStart,
         attacking,
-        not_attacking
+        attackRecovery,
     };
 
     States state;
+
+    float attackStartTime;
     
     public void setTargetOrientation(Quaternion target) {
+        if(state == States.attackRecovery || state == States.attacking)
+        return;
         targetOrientation = target;
     }
 
     //set the direction the player is trying to move in (tilted his joystick in this direction, try to apply velocity)
     public void setTargetMovementDirection(Vector2 target) {
+
+        if(state == States.attackRecovery || state == States.attacking)
+        return;
+
         targetVelocity = target * maxSpeed;
     }
 
     public void activateMeleeAttack() {
         
+        if(state != States.not_attacking)
+        return;
+
+
+        //lunge forward
+        body.AddForce(currentForwardDirection * 25, ForceMode2D.Impulse);
+        attackStartTime = Time.time;
+        state = States.attackStart;
+            // createMeleeAttack();
+    }
+
+    public void onMeleeAttackFinish() {
+        state = States.not_attacking;
+    }
+
+    void createMeleeAttack() {
+
         GameObject attack = GameObject.Instantiate(meleeAttack, transform.localPosition + currentForwardDirection, transform.localRotation, transform);
+        attack.GetComponent<MeleeAttack>().owner = this;
     }
 
     // Start is called before the first frame update
@@ -76,12 +104,14 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Quaternion current = transform.localRotation;
-        transform.localRotation = Quaternion.Slerp(current, targetOrientation, Time.deltaTime * rotationRate);
-        Debug.Log(currentForwardDirection);
+        if(state == States.not_attacking || state == States.attackStart) {
+
+            Quaternion current = transform.localRotation;
+            transform.localRotation = Quaternion.Slerp(current, targetOrientation, Time.deltaTime * rotationRate);
+        }
     }
 
-    void applyInputAcceleration() {
+    void accelerateTowardsTargetVelocity() {
         float velocityDifferenceSquared = (targetVelocity - body.velocity).sqrMagnitude;
 
         //accelerate towards input velocity from current velocity
@@ -99,12 +129,26 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate() {
 
-         if(useAcceleration)
-            applyInputAcceleration();
+        if(state == States.attacking || state == States.attackRecovery)
+            return;
+
+        if(useAcceleration)
+            accelerateTowardsTargetVelocity();
         else
             body.velocity = targetVelocity;
         
         // if(body.velocity.sqrMagnitude > maxSpeed * maxSpeed)
         //     body.velocity = body.velocity.normalized * maxSpeed;
+    }
+
+    private void LateUpdate() {
+        if(state != States.attackStart)
+        return;
+
+        if(state == States.attackStart && Time.time - attackStartTime > 0.25) {
+            state = States.attacking;
+            body.velocity = new Vector2(0,0);
+            createMeleeAttack();
+        }
     }
 }
