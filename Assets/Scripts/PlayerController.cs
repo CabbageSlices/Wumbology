@@ -25,10 +25,11 @@ public class PlayerController : MonoBehaviour
 
     private Vector3 defaultForward = new Vector3(1,0,0);
 
-    private Vector2 currentForwardDirection  {
+    private Vector3 currentForwardDirection  {
         get {
             Quaternion rotator = Quaternion.Euler(0, 0, transform.localRotation.eulerAngles.z);
-            return rotator * defaultForward;
+            var forward = rotator * defaultForward;
+            return new Vector3(forward.x, forward.y, 0).normalized;
         }
     }
 
@@ -57,6 +58,7 @@ public class PlayerController : MonoBehaviour
 
     public void activateMeleeAttack() {
         
+        GameObject attack = GameObject.Instantiate(meleeAttack, transform.localPosition + currentForwardDirection, transform.localRotation, transform);
     }
 
     // Start is called before the first frame update
@@ -65,10 +67,10 @@ public class PlayerController : MonoBehaviour
         body = GetComponent<Rigidbody2D>();
         
         if(body == null)
-            Debug.Log("rigidbody2d component missing in " + name);
+            Debug.LogWarning("rigidbody2d component missing in " + name);
 
         if(meleeAttack == null)
-            Debug.Log("melee attack missing from " + name);
+            Debug.LogWarning("melee attack missing from " + name);
     }
 
     // Update is called once per frame

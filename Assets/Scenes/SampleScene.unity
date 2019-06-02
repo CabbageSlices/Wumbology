@@ -330,7 +330,8 @@ MonoBehaviour:
   accelerationRate: 3
   rotationRate: 24
   maxSpeed: 12
-  meleeAttack: {fileID: 0}
+  meleeAttack: {fileID: 457703096242597897, guid: 7fd697548805d0d429e2f3c3f2443dc0,
+    type: 3}
 --- !u!1001 &457703097280761757
 PrefabInstance:
   m_ObjectHideFlags: 0

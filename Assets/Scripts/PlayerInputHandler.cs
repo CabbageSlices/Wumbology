@@ -57,7 +57,7 @@ public class PlayerInputHandler : MonoBehaviour
         playerController.setTargetMovementDirection(targetMovementDirection);
 
         if(Input.GetKeyDown(swordAttackButton))
-        Debug.Log("sword");
+        playerController.activateMeleeAttack();
 
         if(Input.GetKeyDown(shootButton))
         Debug.Log("gun");
